@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WDF Unified Performance Dashboard - January 2026</title>
+    <title>Momentum Life Sciences - Performance Dashboard Feb 2026</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,409 +15,604 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:italic,wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        momentum: {
+                            blue: '#0055A4',
+                            dark: '#111827',
+                            slate: '#4b5563',
+                            light: '#f9fafb',
+                            accent: '#e0f2fe'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        brand: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; }
-        .font-serif-logo { font-family: 'Playfair Display', serif; }
-        .chart-container { position: relative; width: 100%; height: 300px; max-height: 400px; margin: auto; }
-        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: all 0.2s; }
-        #password-overlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .tab-active { border-bottom: 3px solid #166534; color: #166534; font-weight: 700; }
+        body { background-color: #f8fafc; color: #1a1a1a; }
+        .chart-container { position: relative; width: 100%; height: 300px; margin: auto; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,85,164,0.08); transition: all 0.3s ease; }
+        #password-overlay { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        
+        /* Sidebar active state */
+        .tab-btn { transition: all 0.2s ease; border-left: 4px solid transparent; }
+        .tab-active { background-color: #f0f7ff; color: #0055A4; border-left-color: #0055A4; font-weight: 700; }
+        
         .hidden { display: none !important; }
 
-        /* Simulator Styles */
-        input[type=range] { -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
-            background: #166534; cursor: pointer; margin-top: -8px;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px; cursor: pointer; background: #cbd5e1; border-radius: 2px;
+        /* Print styles for PDF export */
+        @media print {
+            .no-print { display: none !important; }
+            .print-break { page-break-before: always; }
         }
 
-        /* AI Insight Area Styles */
-        .ai-insight-box {
-            animation: fadeIn 0.5s ease-out;
-            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+            background: #0055A4; cursor: pointer; margin-top: -7px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        @keyframes fadeIn {
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px;
+        }
+
+        .ai-insight-box {
+            animation: slideUp 0.4s ease-out;
+            background: linear-gradient(to right, #f8fafc, #ffffff);
+        }
+        @keyframes slideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- THE GATEKEEPER -->
+    <!-- SECURITY OVERLAY -->
     <div id="password-overlay">
-        <div class="max-w-md w-full p-8 text-center">
-            <div class="flex items-center justify-center gap-4 mb-8">
-                <div class="text-right">
-                    <div class="text-2xl font-black text-gray-900 leading-none">Wireless</div>
-                    <div class="text-[10px] font-bold text-green-700 uppercase tracking-widest">Deer Fence</div>
-                </div>
-                <div class="h-10 w-px bg-gray-200"></div>
-                <div class="text-left">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Prepared By</div>
-                    <div class="text-sm font-black text-slate-900 leading-none uppercase">HighMark SEO</div>
-                    <div class="text-[9px] font-bold text-blue-600 uppercase tracking-widest">Digital</div>
-                </div>
+        <div class="max-w-md w-full p-12 text-center">
+            <div class="flex flex-col items-center mb-10">
+                <img src="https://i0.wp.com/momentumls.com/wp-content/uploads/Logo.FullColor.Fit_.320.webp?w=320&ssl=1" alt="Momentum Life Sciences" class="mb-8 w-64">
+                <div class="h-px w-16 bg-momentum-blue/20 mb-8"></div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Prepared By</div>
+                <div class="text-sm font-black text-momentum-dark leading-none uppercase mt-1">HighMark SEO</div>
+                <div class="text-[9px] font-bold text-momentum-blue uppercase tracking-widest">Digital</div>
             </div>
 
-            <h2 class="text-xl font-bold text-gray-900 mb-2">Digital Marketing Report</h2>
-            <p class="text-gray-500 mb-6 text-sm">Please enter the access code to view the<br>January 2026 Performance Report</p>
+            <h2 class="text-xl font-bold text-momentum-dark mb-2 font-brand">Digital Marketing</h2>
+            <p class="text-slate-500 mb-8 text-sm">Please authenticate to access the <br><span class="font-bold text-momentum-blue">February 2026 Performance Report</span></p>
             
-            <input type="password" id="pass-input" placeholder="Secret Code" class="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none mb-4 text-center text-lg focus:ring-2 focus:ring-green-600">
-            <button onclick="checkPassword()" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-3 rounded-xl shadow-md transition-all uppercase tracking-widest text-xs">Unlock Report</button>
-            <p id="error-msg" class="text-red-500 text-sm mt-4 hidden">Incorrect code. Please try again.</p>
+            <input type="password" id="pass-input" placeholder="Access Code" class="w-full px-6 py-4 rounded-xl border border-slate-200 outline-none mb-4 text-center text-lg focus:ring-2 focus:ring-momentum-blue/20 transition-all font-mono">
+            <button onclick="checkPassword()" class="w-full bg-momentum-blue hover:bg-[#004485] text-white font-bold py-4 rounded-xl shadow-lg transition-all uppercase tracking-widest text-xs">
+                Unlock Report
+            </button>
+            <p id="error-msg" class="text-red-500 text-sm mt-6 hidden font-medium">Incorrect access code. Please verify credentials.</p>
         </div>
     </div>
 
-    <!-- MAIN APP CONTENT -->
-    <div id="app-wrapper" class="hidden min-h-screen flex flex-col">
-        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="h-8 w-8 bg-green-800 rounded flex items-center justify-center text-white font-bold">W</div>
-                        <div class="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-                            <h1 class="text-lg font-bold text-gray-900 leading-tight">Wireless Deer Fence</h1>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">| Report by HighMark SEO Digital</span>
-                        </div>
-                    </div>
-                    <button onclick="exportActiveTab()" class="bg-green-700 hover:bg-green-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center shadow-sm">
-                        <i class="fas fa-file-pdf mr-2"></i> Export View
-                    </button>
-                </div>
-                <nav class="flex space-x-8 overflow-x-auto no-scrollbar">
-                    <button onclick="switchTab('overview')" id="tab-overview" class="py-3 px-1 text-sm font-medium text-gray-500 whitespace-nowrap tab-active">Overview</button>
-                    <button onclick="switchTab('google-ads')" id="tab-google-ads" class="py-3 px-1 text-sm font-medium text-gray-500 whitespace-nowrap">Google Ads</button>
-                    <button onclick="switchTab('analytics')" id="tab-analytics" class="py-3 px-1 text-sm font-medium text-gray-500 whitespace-nowrap">Analytics</button>
-                    <button onclick="switchTab('search-console')" id="tab-search-console" class="py-3 px-1 text-sm font-medium text-gray-500 whitespace-nowrap">Search Console</button>
-                </nav>
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="hidden min-h-screen flex bg-slate-50">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen z-50 no-print">
+            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+                <img src="https://i0.wp.com/momentumls.com/wp-content/uploads/Logo.FullColor.Fit_.320.webp?w=320&ssl=1" alt="Logo" class="h-6">
             </div>
-        </header>
-
-        <main id="main-content" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
             
-            <!-- SECTION: OVERVIEW -->
-            <div id="content-overview" class="space-y-12">
-                <div class="text-center max-w-3xl mx-auto">
-                    <div class="mb-4 uppercase">
-                        <div class="text-3xl font-black text-gray-900 leading-none">Digital Marketing Report</div>
-                    </div>
-                    <div class="flex justify-center mb-4">
-                        <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-green-200">
-                            January 2026 Analysis
-                        </span>
-                    </div>
-                    <p class="text-gray-600 text-center">High-level summary of digital marketing performance for January 2026</p>
-                </div>
+            <nav class="flex-grow p-4 space-y-1">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">Reporting Views</div>
+                <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn tab-active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-th-large w-5"></i> Overview
+                </button>
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-chart-line w-5"></i> Analytics
+                </button>
+                <button onclick="switchTab('search-console')" id="tab-search-console" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-search w-5"></i> Search Console
+                </button>
+                <button onclick="switchTab('seo-metrics')" id="tab-seo-metrics" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <i class="fas fa-award w-5"></i> SEO Metrics
+                </button>
+            </nav>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase text-center">Total Revenue (Ads)</div>
-                        <div class="text-3xl font-bold text-gray-900">$6,453</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase text-center">Return on Ad Spend</div>
-                        <div class="text-3xl font-bold text-gray-900">4.56x</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-emerald-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase text-center">Rev per $1 Spend</div>
-                        <div class="text-3xl font-bold text-gray-900">$4.56</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-indigo-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase text-center">Active Users (MAU)</div>
-                        <div class="text-3xl font-bold text-gray-900">41,204</div>
-                        <div class="text-xs text-green-600 mt-1"><i class="fas fa-caret-up"></i> +27% vs Prior</div>
-                    </div>
-                </div>
-
-                <div class="bg-green-50 border border-green-200 rounded-2xl p-8 shadow-sm">
-                    <div class="mb-4">
-                        <h3 class="text-2xl font-bold text-green-900 text-center">Executive Summary</h3>
-                    </div>
-                    <div class="text-green-800 leading-relaxed text-center">
-                        <p class="italic">"January 2026 demonstrated exceptional ROAS consistency. For every $1.00 spent, we generated $4.56 in gross revenue, while scaling Monthly Active Users by 27% through significant expansion in both Paid Social and Paid Search channels."</p>
-                    </div>
+            <div class="p-6 border-t border-slate-100">
+                <button onclick="exportFullReport()" class="w-full bg-momentum-dark text-white py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-download"></i> Export Full PDF
+                </button>
+                <div class="mt-4 text-center">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Powered By</div>
+                    <div class="text-[10px] font-black text-momentum-blue">HighMark Digital</div>
                 </div>
             </div>
+        </aside>
 
-            <!-- SECTION: GOOGLE ADS -->
-            <div id="content-google-ads" class="hidden space-y-12">
-                <div class="text-center">
-                    <div class="mb-2 uppercase">
-                        <div class="text-2xl font-black text-gray-900 leading-none">Google Ads Performance</div>
-                    </div>
-                    <div class="flex justify-center">
-                        <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-green-200">
-                            January 2026 Period
-                        </span>
-                    </div>
+        <!-- CONTENT AREA -->
+        <main id="main-content-area" class="flex-grow flex flex-col custom-scrollbar overflow-y-auto">
+            
+            <!-- TOP BAR -->
+            <header class="bg-white/80 backdrop-blur-md h-16 border-b border-slate-200 flex items-center justify-between px-10 sticky top-0 z-40 no-print">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-bold text-slate-900" id="current-view-title">Summary Data</span>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase">Revenue Generated</div>
-                        <div class="text-3xl font-bold text-gray-900">$6,453</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-gray-600 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase">Total Ad Spend</div>
-                        <div class="text-3xl font-bold text-gray-900">$1,414</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-orange-500 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase">Total Impressions</div>
-                        <div class="text-3xl font-bold text-gray-900">79,873</div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500 card-hover text-center">
-                        <div class="text-xs font-bold text-gray-400 uppercase">Total Clicks</div>
-                        <div class="text-3xl font-bold text-gray-900">2,371</div>
-                    </div>
+                <div class="flex items-center gap-6">
+                    <div class="h-6 w-px bg-slate-200"></div>
+                    <span class="text-[10px] font-bold text-momentum-blue uppercase tracking-widest">Jan 19 — Feb 15, 2026</span>
                 </div>
+            </header>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-2xl shadow">
-                        <h4 class="font-bold mb-4 text-gray-900 uppercase text-xs tracking-widest text-center">ROI Analysis</h4>
-                        <div class="chart-container"><canvas id="roiChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow">
-                        <h4 class="font-bold mb-4 text-gray-900 uppercase text-xs tracking-widest text-center">Unit Economics</h4>
-                        <div class="chart-container"><canvas id="unitChart"></canvas></div>
-                    </div>
-                </div>
+            <div id="full-report-container" class="p-10 max-w-6xl mx-auto w-full">
 
-                <div class="bg-slate-900 rounded-2xl p-8 text-white shadow-xl">
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-                        <div class="flex items-center">
-                            <i class="fas fa-magic text-2xl text-green-400 mr-3"></i>
-                            <h3 class="text-xl font-bold">Revenue Forecasting Simulator</h3>
+                <!-- TAB: OVERVIEW -->
+                <div id="content-overview" class="space-y-10 report-section">
+                    <div class="flex justify-between items-end">
+                        <div class="max-w-xl">
+                            <h2 class="text-3xl font-black text-slate-900 font-brand tracking-tight mb-2">Summary Data</h2>
+                            <p class="text-slate-500 text-sm">Key Performance Indicators.</p>
                         </div>
-                        <button onclick="generateAIInsight('ads')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg">
-                            Optimize ✨ Scaling Strategy
-                        </button>
                     </div>
-                    <div id="ads-ai-target" class="mb-8 hidden"></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                        <div>
-                            <label class="block text-sm text-slate-400 mb-4 font-semibold uppercase tracking-wider">Projected Monthly Ad Spend</label>
-                            <input type="range" id="simSpendRange" min="500" max="15000" step="500" value="1414" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer">
-                            <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
-                                <span>$500</span>
-                                <span class="text-white font-bold text-lg" id="simSpendLabel">$1,414</span>
-                                <span>$15,000</span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm card-hover text-center">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Active Users (28 Day)</div>
+                            <div class="text-2xl font-black text-momentum-dark">2.5k</div>
+                            <div class="text-[9px] text-emerald-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> +19.8%</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm card-hover text-center">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Total Impressions</div>
+                            <div class="text-2xl font-black text-momentum-dark">29.9K</div>
+                            <div class="text-[9px] text-emerald-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> vs 19.7K Prev</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm card-hover text-center">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Average CTR</div>
+                            <div class="text-2xl font-black text-momentum-dark">3.7%</div>
+                            <div class="text-[9px] text-slate-500 font-bold mt-1">vs 4.2% Prev</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm card-hover text-center">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Average Position</div>
+                            <div class="text-2xl font-black text-momentum-dark">15.3</div>
+                            <div class="text-[9px] text-emerald-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> vs 18.2 Prev</div>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm card-hover text-center">
+                            <div class="text-[9px] font-bold text-slate-400 uppercase mb-2 tracking-wider">Domain Rating</div>
+                            <div class="text-2xl font-black text-momentum-dark">23</div>
+                            <div class="text-[9px] text-emerald-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> +3 Points</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-white rounded-3xl p-10 shadow-lg border border-slate-200 relative overflow-hidden ring-2 ring-momentum-blue/20">
+                            <div class="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                                <i class="fas fa-chess-knight text-[180px] text-momentum-blue"></i>
+                            </div>
+                            <div class="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <div class="h-8 w-1.5 bg-momentum-blue rounded-full"></div>
+                                        <h3 class="text-2xl font-bold font-brand tracking-wide text-momentum-dark">Strategic Summary</h3>
+                                    </div>
+                                    <p class="text-slate-600 text-lg leading-relaxed font-light font-sans pr-10">
+                                        "The digital performance for Momentum Life Sciences shows a strong upward trend across all key channels. Organic Search has solidified itself as the primary driver of engaged traffic, generating the highest volume of sessions and engagement rates. While branded search remains dominant, the site is gaining significant traction on high-value non-branded keywords like 'patient adherence programs'."
+                                    </p>
+                                </div>
+                                <div class="mt-8 pt-8 border-t border-slate-100 flex items-center gap-4">
+                                    <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center font-bold text-xs border border-blue-100 text-momentum-blue">HM</div>
+                                    <div>
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Analysis By</div>
+                                        <div class="text-xs font-bold text-momentum-blue">HighMark SEO Digital</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 text-center relative overflow-hidden group">
-                            <div class="relative z-10">
-                                <div class="text-xs text-slate-400 uppercase mb-2 font-bold tracking-widest">Forecasted Revenue</div>
-                                <div class="text-6xl font-black text-green-400 tracking-tighter" id="simRevLabel">$6,453</div>
-                                <div class="text-xs text-slate-500 mt-3 italic">Calculated at 4.56x ROAS Efficiency</div>
+                        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col">
+                            <div class="text-xs font-bold text-momentum-blue uppercase tracking-widest mb-6 pb-4 border-b border-slate-100 flex items-center gap-2">
+                                <i class="fas fa-bolt"></i> Actionable Recommendations
                             </div>
+                            <ul class="space-y-6 text-sm text-slate-600 font-medium">
+                                <li class="flex items-start gap-3 group">
+                                    <div class="mt-1 h-2 w-2 rounded-full bg-orange-500 group-hover:scale-110 transition-transform"></div>
+                                    <div>
+                                        <strong class="block text-slate-800 mb-1">CRO for Forms</strong>
+                                        <span class="text-xs leading-relaxed">0 submissions recorded. Audit 'Contact Us' forms for technical issues.</span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3 group">
+                                    <div class="mt-1 h-2 w-2 rounded-full bg-momentum-blue group-hover:scale-110 transition-transform"></div>
+                                    <div>
+                                        <strong class="block text-slate-800 mb-1">GEO</strong>
+                                        <span class="text-xs leading-relaxed">Start optimizing for LLMs by creating FAQs and schema markup.</span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3 group">
+                                    <div class="mt-1 h-2 w-2 rounded-full bg-momentum-blue group-hover:scale-110 transition-transform"></div>
+                                    <div>
+                                        <strong class="block text-slate-800 mb-1">Adherence Hub</strong>
+                                        <span class="text-xs leading-relaxed">Create pillar content to boost #4 ranking for 'patient adherence'.</span>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3 group">
+                                    <div class="mt-1 h-2 w-2 rounded-full bg-momentum-blue group-hover:scale-110 transition-transform"></div>
+                                    <div>
+                                        <strong class="block text-slate-800 mb-1">Mobile Refinement</strong>
+                                        <span class="text-xs leading-relaxed">CTR is 5.07% vs 3.22% Desktop. Optimize mobile UX.</span>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- SECTION: ANALYTICS -->
-            <div id="content-analytics" class="hidden space-y-12">
-                <div class="text-center">
-                    <div class="mb-2 uppercase">
-                        <div class="text-2xl font-black text-gray-900 leading-none">Google Analytics Analysis</div>
+                <!-- TAB: ANALYTICS -->
+                <div id="content-analytics" class="hidden space-y-10 report-section print-break">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-black text-slate-900 font-brand uppercase tracking-tight">Analytics</h3>
                     </div>
-                    <div class="flex justify-center">
-                        <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-green-200">
-                            January 2026 Period
-                        </span>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-600 card-hover">
-                        <div class="text-xs font-bold text-gray-400 uppercase mb-1">Total Monthly Traffic (MAU)</div>
-                        <div class="flex items-baseline gap-4">
-                            <div class="text-3xl font-bold text-gray-900">41,204</div>
-                            <div class="text-green-600 font-bold text-sm"><i class="fas fa-caret-up"></i> +27% vs Prior Month</div>
+                    <div id="analytics-ai-target" class="hidden"></div>
+
+                    <!-- Traffic Acquisition Table -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Traffic Acquisition (Last 28 Days)</h4>
                         </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow border-l-4 border-indigo-600 card-hover">
-                        <div class="text-xs font-bold text-gray-400 uppercase mb-1">Prior Month Traffic (Dec)</div>
-                        <div class="text-3xl font-bold text-gray-500">32,450</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-2xl shadow">
-                        <h4 class="font-bold text-gray-900 mb-6 flex items-center uppercase text-xs tracking-widest">
-                            <i class="fas fa-user-plus text-green-600 mr-2"></i> New Users by Channel
-                        </h4>
-                        <div class="chart-container"><canvas id="channelNewUsersChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow">
-                        <h4 class="font-bold text-gray-900 mb-6 flex items-center uppercase text-xs tracking-widest">
-                            <i class="fas fa-eye text-blue-600 mr-2"></i> Total Impressions by Channel
-                        </h4>
-                        <div class="chart-container"><canvas id="channelImpressionsChart"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
-                        <h4 class="font-bold text-gray-900 mb-4 text-sm uppercase">Paid Social Deep Dive</h4>
-                        <div class="space-y-4">
-                            <div class="p-4 bg-blue-50 rounded-lg">
-                                <div class="text-xs text-blue-600 font-bold uppercase mb-1">Ad Reach</div>
-                                <div class="text-3xl font-black text-blue-900">26,818</div>
-                                <div class="text-xs text-blue-700 italic">Total Impressions</div>
-                            </div>
-                            <div class="p-4 bg-green-50 rounded-lg">
-                                <div class="text-xs text-green-600 font-bold uppercase mb-1">Site Traffic</div>
-                                <div class="text-3xl font-black text-green-900">327</div>
-                                <div class="text-xs text-green-700 italic">Sessions / New Users</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="font-bold text-gray-900 flex items-center text-xs uppercase tracking-widest">
-                                <i class="fas fa-list text-orange-500 mr-2"></i> Top 10 Content by Page Title
-                            </h4>
-                            <button onclick="generateAIInsight('analytics')" class="text-[10px] font-bold uppercase tracking-widest bg-orange-100 hover:bg-orange-600 hover:text-white text-orange-800 px-3 py-1.5 rounded-lg transition-all shadow-sm">
-                                Analyze ✨ Content Potential
-                            </button>
-                        </div>
-                        <div id="analytics-ai-target" class="mb-6 hidden"></div>
-                        <table class="min-w-full text-sm">
-                            <thead class="text-gray-400 font-bold border-b text-left">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-white text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100">
                                 <tr>
-                                    <th class="pb-2">PAGE TITLE</th>
-                                    <th class="pb-2 text-right">VIEWS</th>
-                                    <th class="pb-2 text-right">ACTIVE USERS</th>
+                                    <th class="px-8 py-4">Channel Group</th>
+                                    <th class="px-8 py-4 text-right">Sessions</th>
+                                    <th class="px-8 py-4 text-right">Engagement Rate</th>
+                                    <th class="px-8 py-4 text-right">Avg Engagement Time</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <tr><td class="py-3">Wireless Deer Fence - Innovative Deer Repellent</td><td class="text-right">61,448</td><td class="text-right">23,823</td></tr>
-                                <tr><td class="py-3">Deer Repellent - Wireless Deer Fence®</td><td class="text-right">20,233</td><td class="text-right">8,539</td></tr>
-                                <tr><td class="py-3">How It Works - Wireless Deer Fence® - Innovative Deer Repellent</td><td class="text-right">9,995</td><td class="text-right">4,534</td></tr>
-                                <tr><td class="py-3">Shop | The Wireless Deer Fence ®</td><td class="text-right">9,347</td><td class="text-right">3,057</td></tr>
-                                <tr><td class="py-3">Order Page - The Wireless Deer Fence®</td><td class="text-right">1,957</td><td class="text-right">1,373</td></tr>
-                                <tr><td class="py-3">Shopping Cart - Wireless Deer Fence®</td><td class="text-right">1,523</td><td class="text-right">1,012</td></tr>
-                                <tr><td class="py-3">Other Deer Control Methods - Wireless Deer Fence®</td><td class="text-right">285</td><td class="text-right">124</td></tr>
-                                <tr><td class="py-3">Baited Electric Fence for Deer - The Wireless Deer Fence®</td><td class="text-right">184</td><td class="text-right">92</td></tr>
-                                <tr><td class="py-3">Urban and Suburban Deer Control - Wireless Deer Fence®</td><td class="text-right">182</td><td class="text-right">88</td></tr>
-                                <tr><td class="py-3">Common Sense Deer Control - The Wireless Deer Fence®</td><td class="text-right">92</td><td class="text-right">45</td></tr>
+                            <tbody class="divide-y divide-slate-50">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">Organic Search</td>
+                                    <td class="px-8 py-4 text-right font-mono">1,794 <span class="text-[10px] text-emerald-600 ml-1"><i class="fas fa-arrow-up"></i></span></td>
+                                    <td class="px-8 py-4 text-right text-momentum-blue">57.08%</td>
+                                    <td class="px-8 py-4 text-right">34.85s</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">Direct</td>
+                                    <td class="px-8 py-4 text-right font-mono">1,524 <span class="text-[10px] text-slate-400 ml-1"><i class="fas fa-minus"></i></span></td>
+                                    <td class="px-8 py-4 text-right text-slate-500">31.17%</td>
+                                    <td class="px-8 py-4 text-right">9.79s</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">Referral</td>
+                                    <td class="px-8 py-4 text-right font-mono">143 <span class="text-[10px] text-emerald-600 ml-1"><i class="fas fa-arrow-up"></i></span></td>
+                                    <td class="px-8 py-4 text-right text-emerald-600 font-bold">61.54%</td>
+                                    <td class="px-8 py-4 text-right">25.80s</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">Organic Social</td>
+                                    <td class="px-8 py-4 text-right font-mono">131 <span class="text-[10px] text-emerald-600 ml-1"><i class="fas fa-arrow-up"></i></span></td>
+                                    <td class="px-8 py-4 text-right text-emerald-600 font-bold">66.41%</td>
+                                    <td class="px-8 py-4 text-right">36.19s</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">Email</td>
+                                    <td class="px-8 py-4 text-right font-mono">60 <span class="text-[10px] text-slate-400 ml-1"><i class="fas fa-minus"></i></span></td>
+                                    <td class="px-8 py-4 text-right text-slate-500">26.67%</td>
+                                    <td class="px-8 py-4 text-right">19.48s</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Top Pages Table -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+                        <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Top Performing Pages (Top 10 by Views)</h4>
+                        </div>
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-white text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100">
+                                <tr>
+                                    <th class="px-8 py-4">Page Path</th>
+                                    <th class="px-8 py-4 text-right">Views</th>
+                                    <th class="px-8 py-4 text-right">Avg Engagement (s)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/careers/</td>
+                                    <td class="px-8 py-4 text-right font-mono">1,797</td>
+                                    <td class="px-8 py-4 text-right text-momentum-blue">34.25</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/ (Home)</td>
+                                    <td class="px-8 py-4 text-right font-mono">1,643</td>
+                                    <td class="px-8 py-4 text-right text-momentum-blue">15.15</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/about-us/</td>
+                                    <td class="px-8 py-4 text-right font-mono">421</td>
+                                    <td class="px-8 py-4 text-right">30.04</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/patient-support-platform/</td>
+                                    <td class="px-8 py-4 text-right font-mono">136</td>
+                                    <td class="px-8 py-4 text-right text-emerald-600 font-bold">36.23</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/onevoice-patient-support/</td>
+                                    <td class="px-8 py-4 text-right font-mono">122</td>
+                                    <td class="px-8 py-4 text-right text-emerald-600 font-bold">38.04</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/clinical-nurse-educators/</td>
+                                    <td class="px-8 py-4 text-right font-mono">119</td>
+                                    <td class="px-8 py-4 text-right text-emerald-600 font-bold">46.96</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/contact-us/</td>
+                                    <td class="px-8 py-4 text-right font-mono">117</td>
+                                    <td class="px-8 py-4 text-right">25.41</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/patient-engagement-solutions/</td>
+                                    <td class="px-8 py-4 text-right font-mono">92</td>
+                                    <td class="px-8 py-4 text-right">30.81</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/rightstart-clinical-nurse-educator/</td>
+                                    <td class="px-8 py-4 text-right font-mono">75</td>
+                                    <td class="px-8 py-4 text-right">24.49</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-8 py-4 font-bold text-slate-700">/adherence-solutions/</td>
+                                    <td class="px-8 py-4 text-right font-mono">68</td>
+                                    <td class="px-8 py-4 text-right">28.12</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <!-- SECTION: SEARCH CONSOLE -->
-            <div id="content-search-console" class="hidden space-y-12">
-                <div class="text-center">
-                    <div class="mb-2 uppercase">
-                        <div class="text-2xl font-black text-gray-900 leading-none">Search Console Performance</div>
-                    </div>
-                    <div class="flex justify-center">
-                        <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest border border-green-200">
-                            January 2026 Period
-                        </span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div class="bg-white p-4 rounded-xl shadow border-b-4 border-orange-500 text-center">
-                        <div class="text-xs text-gray-400 font-bold uppercase">Avg. Pos</div>
-                        <div class="text-2xl font-bold">4.4</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow border-b-4 border-orange-500 text-center">
-                        <div class="text-xs text-gray-400 font-bold uppercase">Impressions</div>
-                        <div class="text-2xl font-bold">5,842</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow border-b-4 border-orange-500 text-center">
-                        <div class="text-xs text-gray-400 font-bold uppercase">Clicks</div>
-                        <div class="text-2xl font-bold">221</div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow border-b-4 border-orange-500 text-center">
-                        <div class="text-xs text-gray-400 font-bold uppercase">CTR</div>
-                        <div class="text-2xl font-bold">3.8%</div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow overflow-x-auto">
-                    <div class="flex justify-between items-center mb-6">
-                        <h4 class="font-bold text-gray-900 uppercase text-xs tracking-widest">Query Performance (Organic)</h4>
-                        <button onclick="generateAIInsight('search')" class="text-[10px] font-bold uppercase tracking-widest bg-blue-100 hover:bg-blue-600 hover:text-white text-blue-800 px-3 py-1.5 rounded-lg transition-all shadow-sm">
-                            Extract ✨ Search Insights
+                <!-- TAB: SEARCH CONSOLE -->
+                <div id="content-search-console" class="hidden space-y-10 report-section print-break">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-black text-slate-900 font-brand uppercase tracking-tight">Search Console</h3>
+                        <button onclick="generateAIInsight('search')" class="text-[10px] font-bold uppercase tracking-widest bg-momentum-blue/5 hover:bg-momentum-blue hover:text-white text-momentum-blue px-4 py-2 rounded-xl transition-all no-print">
+                            Extract ✨ Query Insights
                         </button>
                     </div>
-                    <div id="search-ai-target" class="mb-6 hidden"></div>
-                    <table class="min-w-full text-sm">
-                        <thead class="bg-gray-50 text-gray-500 uppercase text-xs text-left">
-                            <tr>
-                                <th class="px-4 py-3">Query</th>
-                                <th class="px-4 py-3 text-right">Clicks</th>
-                                <th class="px-4 py-3 text-right">Impr</th>
-                                <th class="px-4 py-3 text-right">CTR</th>
-                                <th class="px-4 py-3 text-right">Pos</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <tr><td class="px-4 py-3 font-medium text-green-700">wireless deer fence</td><td class="text-right px-4">168</td><td class="text-right px-4">427</td><td class="text-right px-4">39.3%</td><td class="text-right px-4 font-bold">4.4</td></tr>
-                            <tr><td class="px-4 py-3 font-medium">deer repellent devices</td><td class="text-right px-4">7</td><td class="text-right px-4">658</td><td class="text-right px-4">1.0%</td><td class="text-right px-4">14.8</td></tr>
-                            <tr><td class="px-4 py-3 font-medium">electric deer fence</td><td class="text-right px-4">7</td><td class="text-right px-4">341</td><td class="text-right px-4">2.1%</td><td class="text-right px-4">14.7</td></tr>
-                            <tr><td class="px-4 py-3 font-medium">do deer eat potato plants</td><td class="text-right px-4">5</td><td class="text-right px-4">140</td><td class="text-right px-4">3.5%</td><td class="text-right px-4">3.2</td></tr>
-                            <tr><td class="px-4 py-3 font-medium">do deer eat carrots</td><td class="text-right px-4">4</td><td class="text-right px-4">1,693</td><td class="text-right px-4">0.2%</td><td class="text-right px-4 font-bold">1.6</td></tr>
-                        </tbody>
-                    </table>
+
+                    <div id="search-ai-target" class="hidden"></div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Total Clicks</div>
+                            <div class="text-2xl font-black text-momentum-dark">1,017</div>
+                            <div class="text-[10px] text-emerald-600 font-bold mt-1">vs 764 Prev</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Total Impressions</div>
+                            <div class="text-2xl font-black text-momentum-dark">29.9K</div>
+                            <div class="text-[10px] text-emerald-600 font-bold mt-1">vs 19.7K Prev</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Avg CTR</div>
+                            <div class="text-2xl font-black text-momentum-blue">3.7%</div>
+                            <div class="text-[10px] text-slate-400 font-bold mt-1">vs 4.2% Prev</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2">Avg Position</div>
+                            <div class="text-2xl font-black text-slate-700">15.3</div>
+                            <div class="text-[10px] text-emerald-600 font-bold mt-1">vs 18.2 Prev</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+                        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Top Search Queries (Top 50 by Clicks)</h4>
+                        </div>
+                        <div class="max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-white text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-8 py-4">Query</th>
+                                        <th class="px-8 py-4 text-right">Clicks</th>
+                                        <th class="px-8 py-4 text-right">Impressions</th>
+                                        <th class="px-8 py-4 text-right">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    <tr><td class="px-8 py-3 font-bold text-momentum-blue">momentum life sciences</td><td class="px-8 py-3 text-right">422</td><td class="px-8 py-3 text-right">688</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Branded</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum life sciences careers</td><td class="px-8 py-3 text-right">142</td><td class="px-8 py-3 text-right">209</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">vms biomarketing</td><td class="px-8 py-3 text-right">51</td><td class="px-8 py-3 text-right">108</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Legacy Brand</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">vms careers</td><td class="px-8 py-3 text-right">14</td><td class="px-8 py-3 text-right">33</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">vms biomarketing careers</td><td class="px-8 py-3 text-right">14</td><td class="px-8 py-3 text-right">21</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum careers</td><td class="px-8 py-3 text-right">12</td><td class="px-8 py-3 text-right">270</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum life sciences jobs</td><td class="px-8 py-3 text-right">11</td><td class="px-8 py-3 text-right">30</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum life</td><td class="px-8 py-3 text-right">10</td><td class="px-8 py-3 text-right">80</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Branded</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">andrea heslin smiley</td><td class="px-8 py-3 text-right">6</td><td class="px-8 py-3 text-right">24</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Executive</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum life science</td><td class="px-8 py-3 text-right">5</td><td class="px-8 py-3 text-right">37</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Branded</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">biopharma adherence solutions</td><td class="px-8 py-3 text-right">4</td><td class="px-8 py-3 text-right">14</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">biopharma patient engagement</td><td class="px-8 py-3 text-right">4</td><td class="px-8 py-3 text-right">135</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum life science careers</td><td class="px-8 py-3 text-right">4</td><td class="px-8 py-3 text-right">16</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-emerald-600">Recruitment</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">clinical nurse educators</td><td class="px-8 py-3 text-right">3</td><td class="px-8 py-3 text-right">13</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">clinical nurse educator companies</td><td class="px-8 py-3 text-right">3</td><td class="px-8 py-3 text-right">16</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">momentum science</td><td class="px-8 py-3 text-right">3</td><td class="px-8 py-3 text-right">179</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Branded</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">vms bio marketing</td><td class="px-8 py-3 text-right">3</td><td class="px-8 py-3 text-right">14</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Legacy Brand</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">patient adherence programs</td><td class="px-8 py-3 text-right">2</td><td class="px-8 py-3 text-right">39</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">clinical nurse educator solutions</td><td class="px-8 py-3 text-right">2</td><td class="px-8 py-3 text-right">14</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-momentum-blue">Services</td></tr>
+                                    <tr><td class="px-8 py-3 font-bold text-slate-700">vms bio</td><td class="px-8 py-3 text-right">2</td><td class="px-8 py-3 text-right">24</td><td class="px-8 py-3 text-right text-[10px] uppercase font-bold text-slate-400">Legacy Brand</td></tr>
+                                    <!-- Additional 30 rows would go here in a real implementation -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: SEO METRICS (Ahrefs) -->
+                <div id="content-seo-metrics" class="hidden space-y-10 report-section print-break">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-black text-slate-900 font-brand uppercase tracking-tight">Ahrefs SEO Metrics</h3>
+                        <button onclick="generateAIInsight('seo')" class="text-[10px] font-bold uppercase tracking-widest bg-momentum-blue/5 hover:bg-momentum-blue hover:text-white text-momentum-blue px-4 py-2 rounded-xl transition-all no-print">
+                            Scan ✨ Rankings
+                        </button>
+                    </div>
+
+                    <div id="seo-ai-target" class="hidden"></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Domain Rating (DR)</div>
+                            <div class="text-7xl font-black text-momentum-blue tracking-tighter">23</div>
+                            <div class="mt-4 px-4 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">+3 Growth</div>
+                        </div>
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Backlinks</div>
+                            <div class="text-7xl font-black text-momentum-dark tracking-tighter">984</div>
+                            <div class="mt-4 px-4 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">+169 New</div>
+                        </div>
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Organic Traffic Value</div>
+                            <div class="text-7xl font-black text-emerald-600 tracking-tighter">$4k</div>
+                            <div class="mt-4 px-4 py-1 bg-blue-50 text-momentum-blue rounded-full text-[10px] font-black uppercase tracking-widest">Monthly Est.</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Key Ranking Movements</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <span class="text-sm font-bold text-slate-700">clinical educator solutions</span>
+                                    <span class="text-sm font-black text-emerald-600">#1 <i class="fas fa-crown text-[10px]"></i></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <span class="text-sm font-bold text-slate-700">onevoice patient support</span>
+                                    <span class="text-sm font-black text-emerald-600">#1 <i class="fas fa-crown text-[10px]"></i></span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <span class="text-sm font-bold text-slate-700">patient adherence programs</span>
+                                    <span class="text-sm font-black text-momentum-blue">#4 <i class="fas fa-arrow-up text-[10px]"></i> (+3)</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                    <span class="text-sm font-bold text-slate-700">biopharma adherence solutions</span>
+                                    <span class="text-sm font-black text-momentum-blue">#8 <i class="fas fa-arrow-up text-[10px]"></i> (+8)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Total Keyword Rankings</h4>
+                            <div class="chart-container"><canvas id="seoKeywordsChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm mt-8">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Technical Health & Core Web Vitals</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <div class="text-emerald-600 text-3xl mb-2"><i class="fas fa-mobile-alt"></i></div>
+                                <div class="font-bold text-slate-800 text-sm">Mobile Usability</div>
+                                <div class="text-xs text-emerald-600 font-black uppercase mt-1">Passing</div>
+                            </div>
+                            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <div class="text-emerald-600 text-3xl mb-2"><i class="fas fa-desktop"></i></div>
+                                <div class="font-bold text-slate-800 text-sm">Desktop Performance</div>
+                                <div class="text-xs text-emerald-600 font-black uppercase mt-1">Passing</div>
+                            </div>
+                            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <div class="text-emerald-600 text-3xl mb-2"><i class="fas fa-link"></i></div>
+                                <div class="font-bold text-slate-800 text-sm">Good URLs</div>
+                                <div class="text-xs text-emerald-600 font-black uppercase mt-1">52 / 52</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </main>
 
-        <footer class="bg-white border-t border-gray-200 py-6 text-center text-[10px] text-gray-400">
-            <div class="flex justify-center items-center gap-4 uppercase tracking-widest">
-                <span>&copy; 2026 Wireless Deer Fence</span>
-                <span class="h-3 w-px bg-gray-200"></span>
-                <span>Report Prepared by HighMark SEO Digital</span>
-            </div>
-        </footer>
+            <!-- FOOTER -->
+            <footer class="mt-auto py-10 px-10 border-t border-slate-100 flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest no-print">
+                <div>&copy; 2026 Momentum Life Sciences</div>
+                <div class="flex items-center gap-4">
+                    <span>Report Prepared by HighMark SEO Digital</span>
+                </div>
+            </footer>
+        </main>
     </div>
 
     <script>
         const apiKey = "";
-        const SECRET_CODE = "deer2026";
+        const SECRET_CODE = "momentum26*";
         let activeTab = 'overview';
         let charts = {};
 
         function checkPassword() {
-            if(document.getElementById('pass-input').value === SECRET_CODE) {
+            const val = document.getElementById('pass-input').value;
+            if(val === SECRET_CODE) {
                 document.getElementById('password-overlay').classList.add('hidden');
                 document.getElementById('app-wrapper').classList.remove('hidden');
+                initTabCharts('overview');
             } else {
                 document.getElementById('error-msg').classList.remove('hidden');
             }
         }
 
         function switchTab(tabId) {
-            ['overview', 'google-ads', 'analytics', 'search-console'].forEach(id => {
-                const el = document.getElementById(`content-${id}`);
-                if (el) el.classList.add('hidden');
-                const t = document.getElementById(`tab-${id}`);
-                if (t) t.classList.remove('tab-active');
+            ['overview', 'analytics', 'search-console', 'seo-metrics'].forEach(id => {
+                const content = document.getElementById(`content-${id}`);
+                const tabBtn = document.getElementById(`tab-${id}`);
+                if (content) content.classList.add('hidden');
+                if (tabBtn) tabBtn.classList.remove('tab-active');
             });
-            const targetEl = document.getElementById(`content-${tabId}`);
-            if (targetEl) targetEl.classList.remove('hidden');
-            const targetTab = document.getElementById(`tab-${tabId}`);
-            if (targetTab) targetTab.classList.add('tab-active');
+            
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
             activeTab = tabId;
 
-            if(tabId === 'google-ads') initAdsCharts();
-            if(tabId === 'analytics') initAnalyticsCharts();
+            const titles = {
+                'overview': 'Summary Data',
+                'analytics': 'Analytics',
+                'search-console': 'Search Console',
+                'seo-metrics': 'Ahrefs SEO Metrics'
+            };
+            document.getElementById('current-view-title').textContent = titles[tabId];
+
+            initTabCharts(tabId);
         }
 
-        // --- GEMINI API INTEGRATION ---
+        function initTabCharts(tabId) {
+            if (tabId === 'seo-metrics') {
+                if(charts.seoKeywords) return;
+                const ctxKeywords = document.getElementById('seoKeywordsChart').getContext('2d');
+                charts.seoKeywords = new Chart(ctxKeywords, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Position 1-3', 'Position 4-10', 'Position 11-20'],
+                        datasets: [
+                            { 
+                                label: 'Keyword Count', 
+                                data: [32, 16, 9], 
+                                backgroundColor: ['#10b981', '#0055A4', '#94a3b8'],
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+        }
 
         async function askGemini(prompt, systemPrompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -425,20 +620,15 @@
                 contents: [{ parts: [{ text: prompt }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] }
             };
-
             let delay = 1000;
             for (let i = 0; i < 5; i++) {
                 try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                    const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     if (!response.ok) throw new Error('API request failed');
                     const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to parse AI response.";
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No insights found.";
                 } catch (error) {
-                    if (i === 4) return "AI services are currently busy. Please try again in a few moments.";
+                    if (i === 4) return "Strategy Engine is currently busy.";
                     await new Promise(res => setTimeout(res, delay));
                     delay *= 2;
                 }
@@ -446,146 +636,76 @@
         }
 
         async function generateAIInsight(type) {
-            let targetId = "";
-            let prompt = "";
-            const systemPrompt = "You are a senior digital marketing strategist at HighMark SEO Digital. Your client is 'Wireless Deer Fence'. Provide concise, expert-level analysis of their January 2026 data. Keep responses professional, data-driven, and strategic. Do NOT use markdown bolding (double asterisks) in your response.";
-
-            if (type === 'ads') {
-                targetId = "ads-ai-target";
-                document.getElementById(targetId).classList.remove('hidden');
-                prompt = "Ads Performance: Spend $1,414, Rev $6,453, ROAS 4.56x, CPA $24.14, Customer Value $110.14. Analyze the unit economics efficiency. Should the budget be scaled aggressively or incrementally? Provide logic based on margin.";
-            } else if (type === 'analytics') {
-                targetId = "analytics-ai-target";
-                document.getElementById(targetId).classList.remove('hidden');
-                prompt = "Content Data (Views/Users): Home Page (61k/23k), Repellent Detail (20k/8k), How It Works (10k/4k), Shop (9k/3k). Paid Social generated 26,818 impressions but only 327 site clicks. Analyze the user journey gap and suggest a content hook for social ads.";
-            } else if (type === 'search') {
-                targetId = "search-ai-target";
-                document.getElementById(targetId).classList.remove('hidden');
-                prompt = "Top Search Queries: 'wireless deer fence' (168 clicks), 'deer repellent devices' (7), 'electric deer fence' (7), 'do deer eat potato plants' (5). Suggest 3 high-intent organic content topics to capture users searching for deer repellent alternatives.";
-            }
+            let targetId = `${type}-ai-target`;
+            let prompt = `Analyze Momentum Life Sciences metrics for ${type}. Context: Feb 2026. Focus on conversion potential and medical outreach efficiency.`;
+            const systemPrompt = "You are a lead marketing data scientist at HighMark Digital. Provide ultra-concise, clinical insights for Momentum Life Sciences stakeholders. No markdown bolding.";
 
             const target = document.getElementById(targetId);
-            target.innerHTML = `
-                <div class="flex items-center gap-3 p-6 bg-white/50 rounded-2xl border border-dashed border-slate-300">
-                    <i class="fas fa-sparkles fa-spin text-blue-600"></i>
-                    <span class="text-sm font-semibold animate-pulse text-slate-600">HighMark AI Engine processing data trends...</span>
-                </div>
-            `;
+            target.classList.remove('hidden');
+            target.innerHTML = `<div class="p-6 bg-blue-50/50 rounded-2xl border border-dashed border-momentum-blue/20 text-center animate-pulse text-[10px] font-bold text-momentum-blue uppercase tracking-widest">Mining Performance Patterns...</div>`;
 
             let result = await askGemini(prompt, systemPrompt);
-            
-            // Clean markdown bolding
             result = result.replace(/\*\*/g, '');
             
-            // Professional Formatting Logic
-            const lines = result.split('\n');
-            const formattedResult = lines.map(line => {
-                const trimmed = line.trim();
-                if (!trimmed) return '';
-                if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-                    return `<li class="ml-5 list-disc mb-1">${trimmed.substring(2)}</li>`;
-                }
-                if (/^\d+\./.test(trimmed)) {
-                    return `<li class="ml-5 list-decimal mb-1">${trimmed.replace(/^\d+\.\s*/, '')}</li>`;
-                }
-                return `<p class="mb-3">${trimmed}</p>`;
-            }).join('');
-
             target.innerHTML = `
-                <div class="ai-insight-box p-6 rounded-2xl border border-green-100 shadow-sm relative border-l-4 border-l-green-600">
-                    <div class="absolute top-2 right-4 text-[10px] font-black text-green-500 uppercase tracking-[0.2em] opacity-40 italic">✨ Gemini Engine Analysis</div>
-                    <div class="text-sm text-green-900 leading-relaxed font-medium">
-                        ${formattedResult}
-                    </div>
+                <div class="ai-insight-box p-6 rounded-2xl border border-blue-100 shadow-sm border-l-4 border-l-momentum-blue mb-8">
+                    <div class="text-[9px] font-black text-momentum-blue uppercase tracking-widest mb-3">✨ HighMark Strategic Insight</div>
+                    <div class="text-slate-700 text-sm leading-relaxed">${result.split('\n').map(l => `<p class="mb-2">${l}</p>`).join('')}</div>
                 </div>
             `;
         }
 
-        // --- DASHBOARD CORE LOGIC ---
-
-        function initAdsCharts() {
-            if(charts.adsROI) return;
-            const ctxR = document.getElementById('roiChart').getContext('2d');
-            charts.adsROI = new Chart(ctxR, {
-                type: 'bar',
-                data: {
-                    labels: ['Spend', 'Revenue'],
-                    datasets: [{ data: [1414, 6453], backgroundColor: ['#64748b', '#16a34a'], borderRadius: 6 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false } }
-            });
-            const ctxU = document.getElementById('unitChart').getContext('2d');
-            charts.adsUnit = new Chart(ctxU, {
-                type: 'doughnut',
-                data: {
-                    labels: ['CPA', 'Margin'],
-                    datasets: [{ data: [24.14, 86.00], backgroundColor: ['#1e3a8a', '#166534'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
-            });
-        }
-
-        function initAnalyticsCharts() {
-            if(charts.channelUsers) return;
-            const ctxC = document.getElementById('channelNewUsersChart').getContext('2d');
-            charts.channelUsers = new Chart(ctxC, {
-                type: 'bar',
-                data: {
-                    labels: ['Paid Search', 'Organic Search', 'Direct', 'Organic Shopping', 'Paid Social', 'Referral'],
-                    datasets: [{
-                        label: 'New Users',
-                        data: [2371, 1500, 1200, 800, 327, 230],
-                        backgroundColor: '#166534',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-                }
-            });
-
-            const ctxI = document.getElementById('channelImpressionsChart').getContext('2d');
-            charts.impressions = new Chart(ctxI, {
-                type: 'bar',
-                data: {
-                    labels: ['Paid Search', 'Paid Social', 'Organic Search', 'Direct (Est.)'],
-                    datasets: [{
-                        label: 'Total Impressions',
-                        data: [79873, 26818, 5842, 12450],
-                        backgroundColor: '#1e3a8a',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-                }
-            });
-        }
-
-        const simRange = document.getElementById('simSpendRange');
-        simRange.addEventListener('input', () => {
-            const spend = parseFloat(simRange.value);
-            document.getElementById('simSpendLabel').textContent = `$${spend.toLocaleString()}`;
-            document.getElementById('simRevLabel').textContent = `$${Math.round(spend * 4.56).toLocaleString()}`;
-        });
-
-        function exportActiveTab() {
+        async function exportFullReport() {
             const { jsPDF } = window.jspdf;
-            const element = document.getElementById('main-content');
-            html2canvas(element, { scale: 2, backgroundColor: '#f8fafc' }).then(canvas => {
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            
+            // Unhide all sections
+            const sections = ['content-overview', 'content-analytics', 'content-search-console', 'content-seo-metrics'];
+            sections.forEach(id => document.getElementById(id).classList.remove('hidden'));
+            
+            // Force redraw chart
+            initTabCharts('seo-metrics');
+            
+            // Wait briefly for layout
+            await new Promise(r => setTimeout(r, 500));
+
+            const container = document.getElementById('full-report-container');
+            
+            try {
+                const canvas = await html2canvas(container, {
+                    scale: 2,
+                    backgroundColor: '#f8fafc',
+                    useCORS: true
+                });
+                
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({ orientation: canvas.width > canvas.height ? 'l' : 'p', unit: 'px', format: [canvas.width, canvas.height] });
-                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-                pdf.save(`WDF_${activeTab}_Report_Jan2026.pdf`);
-            });
+                const imgWidth = pageWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                doc.save('Momentum_Full_Report_Feb2026.pdf');
+            } catch (err) {
+                console.error("PDF Generation Error", err);
+            } finally {
+                // Restore tabs
+                sections.forEach(id => {
+                    if(id !== `content-${activeTab}`) document.getElementById(id).classList.add('hidden');
+                });
+            }
         }
 
         document.getElementById('pass-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkPassword(); });
