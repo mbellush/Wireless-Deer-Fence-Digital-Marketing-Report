@@ -225,6 +225,9 @@ function renderAll() {
     // ── Organic Rankings ──
     renderRankings();
 
+    // ── Recommendations ──
+    renderRecommendations();
+
     updateCharts();
 }
 
@@ -234,6 +237,27 @@ function setEl(id, val) {
 }
 function escHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ════════════════════════════════════════════════
+//  RECOMMENDATIONS RENDER
+// ════════════════════════════════════════════════
+function renderRecommendations() {
+    const list = document.getElementById('rec-list');
+    if (!list) return;
+    const recs = (reportData.recommendations || []).filter(r => r.title && r.title.trim());
+    if (!recs.length) {
+        list.innerHTML = '<li style="color:#94a3b8;font-size:12px;font-style:italic;">No recommendations yet. Add them in Admin → Report Date tab.</li>';
+        return;
+    }
+    list.innerHTML = recs.map(r => `
+        <li class="rec-item">
+          <span class="rec-dot ${r.priority || 'medium'}"></span>
+          <div>
+            <div class="rec-title">${escHtml(r.title)}</div>
+            ${r.body ? `<div class="rec-body">${escHtml(r.body)}</div>` : ''}
+          </div>
+        </li>`).join('');
 }
 
 // ════════════════════════════════════════════════
@@ -508,6 +532,19 @@ function openAdmin() {
         ? Math.round(((d.analytics.mau - d.analytics.mauPrior) / d.analytics.mauPrior) * 100) : 0;
     const autoSummary = `${d.period} demonstrated exceptional ROAS consistency. For every $1.00 spent, we generated $${Number(d.googleAds.roas).toFixed(2)} in gross revenue, while scaling Monthly Active Users to ${fmtN(d.analytics.mau)} — a ${mauPct > 0 ? '+' + mauPct : mauPct}% increase over ${d.analytics.priorMonthName}.`;
     document.getElementById('admin-exec-summary').value = d.execSummary || autoSummary;
+
+    // Prefill recommendations
+    const recRows = document.querySelectorAll('.admin-rec-row');
+    const recs = reportData.recommendations || [];
+    recRows.forEach((row, i) => {
+        const rec = recs[i] || {};
+        const priorityEl = row.querySelector('.rec-priority');
+        const titleEl = row.querySelector('.rec-title');
+        const bodyEl = row.querySelector('.rec-body');
+        if (priorityEl) priorityEl.value = rec.priority || 'medium';
+        if (titleEl) titleEl.value = rec.title || '';
+        if (bodyEl) bodyEl.value = rec.body || '';
+    });
 }
 function closeAdmin() {
     document.getElementById('admin-overlay').classList.remove('open');
@@ -672,6 +709,16 @@ function applyAndSave() {
         reportData.organicRankings = parsedUploads.rankings.rankings || [];
     }
 
+    // Recommendations
+    const recRowEls = document.querySelectorAll('.admin-rec-row');
+    reportData.recommendations = [];
+    recRowEls.forEach(row => {
+        const title = row.querySelector('.rec-title')?.value.trim() || '';
+        const body = row.querySelector('.rec-body')?.value.trim() || '';
+        const priority = row.querySelector('.rec-priority')?.value || 'medium';
+        reportData.recommendations.push({ priority, title, body });
+    });
+
     saveReportData();
     Object.values(charts).forEach(c => c.destroy());
     charts = {};
@@ -698,17 +745,48 @@ function exportJSON() {
 }
 
 // ════════════════════════════════════════════════
-//  PDF EXPORT
+//  PDF EXPORT  (all tabs, one page each)
 // ════════════════════════════════════════════════
-function exportPDF() {
+async function exportPDF() {
     const { jsPDF } = window.jspdf;
-    const el = document.getElementById('main-content');
-    html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+    const tabs = ['overview', 'google-ads', 'organic-rankings', 'analytics', 'search-console'];
+    const originalTab = activeTab;
+    const btn = document.querySelector('.export-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting…'; }
+
+    let pdf = null;
+
+    for (const tab of tabs) {
+        // Switch to tab and make sure charts are initialized
+        switchTab(tab);
+        if (tab === 'google-ads') initAdsCharts();
+        if (tab === 'analytics') initAnalyticsCharts();
+
+        // Brief pause so charts/layout render completely
+        await new Promise(r => setTimeout(r, 350));
+
+        const el = document.getElementById('main-content');
+        const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#f8fafc', useCORS: true, logging: false });
         const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({ orientation: canvas.width > canvas.height ? 'l' : 'p', unit: 'px', format: [canvas.width, canvas.height] });
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save('WDF_' + activeTab + '_' + reportData.period.replace(/\s/g, '_') + '.pdf');
-    });
+        const pw = canvas.width;
+        const ph = canvas.height;
+
+        if (!pdf) {
+            pdf = new jsPDF({ orientation: pw > ph ? 'l' : 'p', unit: 'px', format: [pw, ph] });
+        } else {
+            pdf.addPage([pw, ph], pw > ph ? 'l' : 'p');
+        }
+        pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
+    }
+
+    // Restore original tab
+    switchTab(originalTab);
+    if (originalTab === 'google-ads') initAdsCharts();
+    if (originalTab === 'analytics') initAnalyticsCharts();
+
+    pdf.save('WDF_FullReport_' + reportData.period.replace(/\s/g, '_') + '.pdf');
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-pdf"></i> Export PDF'; }
 }
 
 // ════════════════════════════════════════════════

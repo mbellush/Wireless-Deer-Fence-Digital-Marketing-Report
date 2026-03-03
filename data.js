@@ -54,7 +54,12 @@ const DEFAULT_DATA = {
     ]
   },
   organicRankings: [],
-  execSummary: null
+  execSummary: null,
+  recommendations: [
+    { priority: "high", title: "Increase Ad Budget", body: "ROAS of 4.56x indicates strong efficiency. Scaling spend to $2,000/mo could yield ~$9,100 in revenue." },
+    { priority: "medium", title: "Improve Organic CTR", body: "Avg position 4.4 but CTR only 3.8%. Review and refresh meta titles on top landing pages." },
+    { priority: "medium", title: "Optimize Shop Page", body: "Shop page has high views but lower conversions. A/B test CTA buttons and product imagery." }
+  ]
 };
 
 // ── Merge defaults into saved data (so new fields are never missing) ──
