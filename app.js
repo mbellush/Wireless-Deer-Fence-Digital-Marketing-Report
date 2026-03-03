@@ -745,30 +745,130 @@ function exportJSON() {
 }
 
 // ════════════════════════════════════════════════
-//  PDF EXPORT  — uses browser print (window.print)
-//  @media print CSS in styles.css handles layout,
-//  color, headers, and page breaks automatically.
+//  PDF EXPORT — standalone popup with inline styles
 // ════════════════════════════════════════════════
 function exportPDF() {
-    // Stamp data-print-title on each tab so the CSS ::before header shows
-    const tabTitles = {
-        'tab-overview': 'Wireless Deer Fence  ·  Digital Marketing Report  ·  ' + reportData.period,
-        'tab-google-ads': 'Google Ads Performance  ·  ' + reportData.period,
-        'tab-organic-rankings': 'Organic Rankings  ·  ' + reportData.period,
-        'tab-analytics': 'Google Analytics  ·  ' + reportData.period,
-        'tab-search-console': 'Search Console  ·  ' + reportData.period
+    const d = reportData;
+    const c = (v) => Number(v || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    const num = (v) => Number(v || 0).toLocaleString('en-US');
+    const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const pctHtml = (cur, prior) => {
+        if (!prior) return '';
+        const diff = ((cur - prior) / prior) * 100;
+        const col = diff >= 0 ? '#16a34a' : '#dc2626';
+        return `<div style="font-size:9pt;font-weight:600;color:${col};margin-top:4px">${diff >= 0 ? '▲' : '▼'} ${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs prior</div>`;
     };
-    Object.entries(tabTitles).forEach(([id, title]) => {
-        const el = document.getElementById(id);
-        if (el) el.setAttribute('data-print-title', title);
-    });
+    const dotCol = (p) => ({ high: '#dc2626', medium: '#f97316', low: '#22c55e' }[p] || '#94a3b8');
 
-    // Make sure all charts are rendered before printing
-    initAdsCharts();
-    initAnalyticsCharts();
+    const CSS = `*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:A4 landscape;margin:12mm 16mm}
+.page{page-break-after:always;break-after:page;padding-bottom:8px}
+.page:last-child{page-break-after:avoid;break-after:avoid}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #16a34a;padding-bottom:8px;margin-bottom:18px}
+.hdr-left{}
+.client{font-size:14pt;font-weight:900;color:#0f172a;line-height:1}
+.section{font-size:8pt;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.period{font-size:9pt;font-weight:600;color:#475569}
+.krow{display:flex;gap:12px;margin-bottom:18px}
+.k{flex:1;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px 14px;background:#fff}
+.klbl{font-size:7.5pt;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kval{font-size:19pt;font-weight:900;color:#0f172a;line-height:1.1}
+.card{border:1.5px solid #e2e8f0;border-radius:8px;padding:16px;background:#fff;margin-bottom:14px}
+.ctitle{font-size:8pt;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.exec{font-size:10.5pt;color:#1e293b;line-height:1.7;font-style:italic}
+.rec-row{display:flex;gap:14px;flex-wrap:wrap}
+.ri{flex:1;min-width:150px;margin-bottom:4px}
+.rt{font-size:9.5pt;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.rb{font-size:8.5pt;color:#475569;line-height:1.5;padding-left:12px}
+.two{display:flex;gap:14px}
+.two>*{flex:1}
+table{width:100%;border-collapse:collapse;font-size:8.5pt}
+th{padding:6px 8px;background:#f8fafc;color:#475569;font-weight:700;text-align:left;border-bottom:2px solid #e2e8f0;font-size:7.5pt;text-transform:uppercase;letter-spacing:.04em}
+td{padding:6px 8px;border-bottom:1px solid #f1f5f9;color:#0f172a}
+tr:nth-child(even) td{background:#fafafa}
+tr:last-child td{border-bottom:none}
+.nd{color:#94a3b8;font-style:italic;font-size:9pt;padding:10px 0}`;
 
-    // Short delay then print
-    setTimeout(() => window.print(), 200);
+    const hdr = (sec) => `<div class="hdr"><div class="hdr-left"><div class="client">Wireless Deer Fence</div><div class="section">${esc(sec)}</div></div><div class="period">Digital Marketing Report &nbsp;·&nbsp; ${esc(d.period)}</div></div>`;
+
+    // ── Page 1: Overview ──
+    const mauPct = typeof d.analytics.mauPrior === 'number' ? d.analytics.mauPrior : 0;
+    const mauCol = mauPct >= 0 ? '#16a34a' : '#dc2626';
+    const recs = (d.recommendations || []).filter(r => r && r.title);
+
+    const p1 = `<div class="page">${hdr('Performance Overview')}
+<div class="krow">
+  <div class="k" style="border-top:3px solid #22c55e"><div class="klbl">Total Revenue (Ads)</div><div class="kval">${c(d.googleAds.revenue)}</div>${pctHtml(d.googleAds.revenue, d.googleAds.revenuePrior)}</div>
+  <div class="k" style="border-top:3px solid #3b82f6"><div class="klbl">Return on Ad Spend</div><div class="kval">${Number(d.googleAds.roas || 0).toFixed(2)}x</div>${pctHtml(d.googleAds.roas, d.googleAds.roasPrior)}</div>
+  <div class="k" style="border-top:3px solid #f97316"><div class="klbl">Rev per $1 Spent</div><div class="kval">$${Number(d.googleAds.roas || 0).toFixed(2)}</div></div>
+  <div class="k" style="border-top:3px solid #6366f1"><div class="klbl">Active Users</div><div class="kval">${num(d.analytics.mau)}</div><div style="font-size:9pt;font-weight:600;color:${mauCol};margin-top:4px">${mauPct >= 0 ? '▲' : '▼'} ${mauPct >= 0 ? '+' : ''}${mauPct.toFixed(1)}% vs prior</div></div>
+</div>
+<div class="card"><div class="ctitle">Executive Summary</div><div class="exec">${esc(d.execSummary || 'No executive summary entered.')}</div></div>
+<div class="card"><div class="ctitle" style="color:#6366f1">⚡ Actionable Recommendations</div>
+  <div class="rec-row">${recs.length ? recs.map(r => `<div class="ri"><div class="rt"><span class="dot" style="background:${dotCol(r.priority)}"></span>${esc(r.title)}</div><div class="rb">${esc(r.body)}</div></div>`).join('') : '<div class="nd">No recommendations entered yet.</div>'}</div>
+</div></div>`;
+
+    // ── Page 2: Google Ads ──
+    const campaigns = d.googleAds.campaigns || [];
+    const terms = d.googleAds.searchTerms || [];
+    const p2 = `<div class="page">${hdr('Google Ads Performance')}
+<div class="krow">
+  <div class="k" style="border-top:3px solid #22c55e"><div class="klbl">Revenue</div><div class="kval">${c(d.googleAds.revenue)}</div>${pctHtml(d.googleAds.revenue, d.googleAds.revenuePrior)}</div>
+  <div class="k" style="border-top:3px solid #3b82f6"><div class="klbl">Ad Spend</div><div class="kval">${c(d.googleAds.spend)}</div></div>
+  <div class="k" style="border-top:3px solid #6366f1"><div class="klbl">ROAS</div><div class="kval">${Number(d.googleAds.roas || 0).toFixed(2)}x</div>${pctHtml(d.googleAds.roas, d.googleAds.roasPrior)}</div>
+  <div class="k" style="border-top:3px solid #f97316"><div class="klbl">Impressions</div><div class="kval">${num(d.googleAds.impressions)}</div>${pctHtml(d.googleAds.impressions, d.googleAds.impressionsPrior)}</div>
+  <div class="k" style="border-top:3px solid #22c55e"><div class="klbl">Clicks</div><div class="kval">${num(d.googleAds.clicks)}</div>${pctHtml(d.googleAds.clicks, d.googleAds.clicksPrior)}</div>
+  <div class="k" style="border-top:3px solid #3b82f6"><div class="klbl">Cost / Conv.</div><div class="kval">${c(d.googleAds.cpa)}</div></div>
+</div>
+<div class="two">
+  <div class="card"><div class="ctitle">Campaigns</div>${campaigns.length ? `<table><thead><tr><th>Campaign</th><th>Spend</th><th>Revenue</th><th>ROAS</th><th>Clicks</th></tr></thead><tbody>${campaigns.map(r => `<tr><td>${esc(r.campaign || r.name || '—')}</td><td>${c(r.spend || r.cost)}</td><td>${c(r.revenue || r.conversionsValue)}</td><td>${Number((r.revenue || r.conversionsValue || 0) / (r.spend || r.cost || 1)).toFixed(2)}x</td><td>${num(r.clicks)}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">Upload Google Ads CSV in Admin.</div>'}</div>
+  <div class="card"><div class="ctitle">Top Search Terms</div>${terms.length ? `<table><thead><tr><th>Search Term</th><th>Clicks</th><th>Impr.</th><th>CTR</th></tr></thead><tbody>${terms.slice(0, 12).map(r => `<tr><td>${esc(r.searchTerm || r.term || r.query || '—')}</td><td>${num(r.clicks)}</td><td>${num(r.impressions)}</td><td>${r.ctr || '—'}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">No search term data available.</div>'}</div>
+</div></div>`;
+
+    // ── Page 3: Analytics ──
+    const engRate = d.analytics.avgEngagementRate || 0;
+    const engTime = d.analytics.avgEngagementTime || 0;
+    const mm2 = Math.floor(engTime / 60), ss2 = Math.floor(engTime % 60);
+    const channels = d.analytics.channels || [];
+    const pages = d.analytics.pages || [];
+    const p3 = `<div class="page">${hdr('Google Analytics')}
+<div class="krow">
+  <div class="k" style="border-top:3px solid #22c55e"><div class="klbl">Active Users</div><div class="kval">${num(d.analytics.mau)}</div></div>
+  <div class="k" style="border-top:3px solid #3b82f6"><div class="klbl">Key Events</div><div class="kval">${num(d.analytics.keyEvents) || '—'}</div></div>
+  <div class="k" style="border-top:3px solid #f97316"><div class="klbl">Engagement Rate</div><div class="kval">${engRate ? engRate.toFixed(1) + '%' : '—'}</div></div>
+  <div class="k" style="border-top:3px solid #6366f1"><div class="klbl">Avg. Eng. Time</div><div class="kval">${engTime ? `${mm2}:${String(ss2).padStart(2, '0')}` : '—'}</div></div>
+</div>
+<div class="two">
+  <div class="card"><div class="ctitle">Traffic by Channel</div>${channels.length ? `<table><thead><tr><th>Channel</th><th>Users</th><th>Sessions</th><th>Eng. Rate</th></tr></thead><tbody>${channels.map(r => `<tr><td>${esc(r.channel || r.channelGroup || '—')}</td><td>${num(r.users || r.activeUsers)}</td><td>${num(r.sessions)}</td><td>${r.engagementRate ? (Number(r.engagementRate) * 100).toFixed(1) + '%' : '—'}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">Upload GA4 CSV in Admin.</div>'}</div>
+  <div class="card"><div class="ctitle">Top Pages</div>${pages.length ? `<table><thead><tr><th>Page</th><th>Views</th><th>Users</th></tr></thead><tbody>${pages.slice(0, 12).map(r => `<tr><td>${esc(r.page || r.pagePath || r.pageTitle || '—')}</td><td>${num(r.views || r.screenPageViews)}</td><td>${num(r.users || r.activeUsers)}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">No page data available.</div>'}</div>
+</div></div>`;
+
+    // ── Page 4: Organic Rankings ──
+    const kws = (d.organicRankings && d.organicRankings.keywords) || [];
+    const p4 = `<div class="page">${hdr('Organic Rankings')}
+<div class="card"><div class="ctitle">Keyword Rankings by Position</div>${kws.length ? `<table><thead><tr><th>#</th><th>Position</th><th>Keyword</th></tr></thead><tbody>${kws.slice(0, 35).map((r, i) => `<tr><td style="color:#94a3b8">${i + 1}</td><td style="font-weight:700;color:#0f172a">${r.position || r.rank || '—'}</td><td>${esc(r.keyword || r.query || '—')}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">Upload an Organic Rankings CSV in Admin to populate this section.</div>'}</div>
+</div>`;
+
+    // ── Page 5: Search Console ──
+    const sc = d.searchConsole || {};
+    const scRows = sc.queries || sc.keywords || [];
+    const p5 = `<div class="page">${hdr('Google Search Console')}
+<div class="krow">
+  <div class="k" style="border-top:3px solid #22c55e"><div class="klbl">Total Clicks</div><div class="kval">${num(sc.totalClicks) || '—'}</div></div>
+  <div class="k" style="border-top:3px solid #3b82f6"><div class="klbl">Total Impressions</div><div class="kval">${num(sc.totalImpressions) || '—'}</div></div>
+  <div class="k" style="border-top:3px solid #f97316"><div class="klbl">Avg. CTR</div><div class="kval">${sc.avgCtr ? (Number(sc.avgCtr) * 100).toFixed(2) + '%' : '—'}</div></div>
+  <div class="k" style="border-top:3px solid #6366f1"><div class="klbl">Avg. Position</div><div class="kval">${sc.avgPosition ? Number(sc.avgPosition).toFixed(1) : '—'}</div></div>
+</div>
+<div class="card"><div class="ctitle">Top Search Queries</div>${scRows.length ? `<table><thead><tr><th>Query</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead><tbody>${scRows.slice(0, 20).map(r => `<tr><td>${esc(r.query || r.keyword || '—')}</td><td>${num(r.clicks)}</td><td>${num(r.impressions)}</td><td>${r.ctr ? (Number(r.ctr) * 100).toFixed(2) + '%' : '—'}</td><td>${r.position ? Number(r.position).toFixed(1) : '—'}</td></tr>`).join('')}</tbody></table>` : '<div class="nd">Upload Search Console CSV in Admin to see queries.</div>'}</div>
+</div>`;
+
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Wireless Deer Fence — ${esc(d.period)}</title><style>${CSS}</style></head><body>${p1}${p2}${p3}${p4}${p5}<script>window.onload=()=>window.print();<\/script></body></html>`;
+
+    const w = window.open('', '_blank', 'width=1200,height=900');
+    if (w) { w.document.write(html); w.document.close(); }
+    else { alert('Please allow popups for this site, then click Export PDF again.'); }
 }
 
 // ════════════════════════════════════════════════
