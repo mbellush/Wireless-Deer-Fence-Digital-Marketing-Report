@@ -745,7 +745,7 @@ function exportJSON() {
 }
 
 // ════════════════════════════════════════════════
-//  PDF EXPORT  (all tabs, one page each)
+//  PDF EXPORT  (all tabs, full-height capture)
 // ════════════════════════════════════════════════
 async function exportPDF() {
     const { jsPDF } = window.jspdf;
@@ -754,29 +754,55 @@ async function exportPDF() {
     const btn = document.querySelector('.export-btn');
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting…'; }
 
-    let pdf = null;
+    // A4 landscape in mm
+    const PAGE_W_MM = 297;
+    const PAGE_H_MM = 210;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    let firstPage = true;
 
     for (const tab of tabs) {
-        // Switch to tab and make sure charts are initialized
+        // Switch to tab and initialise any charts
         switchTab(tab);
         if (tab === 'google-ads') initAdsCharts();
         if (tab === 'analytics') initAnalyticsCharts();
 
-        // Brief pause so charts/layout render completely
-        await new Promise(r => setTimeout(r, 350));
+        // Let charts & layout settle
+        await new Promise(r => setTimeout(r, 500));
 
-        const el = document.getElementById('main-content');
-        const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#f8fafc', useCORS: true, logging: false });
-        const imgData = canvas.toDataURL('image/png');
-        const pw = canvas.width;
-        const ph = canvas.height;
+        // Capture the tab-pane itself (full scroll height, not just visible viewport)
+        const el = document.getElementById('tab-' + tab);
+        if (!el) continue;
 
-        if (!pdf) {
-            pdf = new jsPDF({ orientation: pw > ph ? 'l' : 'p', unit: 'px', format: [pw, ph] });
-        } else {
-            pdf.addPage([pw, ph], pw > ph ? 'l' : 'p');
-        }
-        pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
+        const canvas = await html2canvas(el, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: el.scrollWidth,
+            width: el.scrollWidth,
+            height: el.scrollHeight
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+        // Work out how to fit the captured image onto the A4 landscape page
+        const imgW = canvas.width;
+        const imgH = canvas.height;
+        const ratio = Math.min(PAGE_W_MM / imgW, PAGE_H_MM / imgH);
+        const fitW = imgW * ratio;
+        const fitH = imgH * ratio;
+        const offsetX = (PAGE_W_MM - fitW) / 2;
+        const offsetY = (PAGE_H_MM - fitH) / 2;
+
+        if (!firstPage) pdf.addPage('a4', 'landscape');
+        firstPage = false;
+
+        // White page background, then image
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, PAGE_W_MM, PAGE_H_MM, 'F');
+        pdf.addImage(imgData, 'JPEG', offsetX, offsetY, fitW, fitH);
     }
 
     // Restore original tab
