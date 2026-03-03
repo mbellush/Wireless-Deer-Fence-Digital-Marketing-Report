@@ -745,74 +745,30 @@ function exportJSON() {
 }
 
 // ════════════════════════════════════════════════
-//  PDF EXPORT  (all tabs, full-height capture)
+//  PDF EXPORT  — uses browser print (window.print)
+//  @media print CSS in styles.css handles layout,
+//  color, headers, and page breaks automatically.
 // ════════════════════════════════════════════════
-async function exportPDF() {
-    const { jsPDF } = window.jspdf;
-    const tabs = ['overview', 'google-ads', 'organic-rankings', 'analytics', 'search-console'];
-    const originalTab = activeTab;
-    const btn = document.querySelector('.export-btn');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting…'; }
+function exportPDF() {
+    // Stamp data-print-title on each tab so the CSS ::before header shows
+    const tabTitles = {
+        'tab-overview': 'Wireless Deer Fence  ·  Digital Marketing Report  ·  ' + reportData.period,
+        'tab-google-ads': 'Google Ads Performance  ·  ' + reportData.period,
+        'tab-organic-rankings': 'Organic Rankings  ·  ' + reportData.period,
+        'tab-analytics': 'Google Analytics  ·  ' + reportData.period,
+        'tab-search-console': 'Search Console  ·  ' + reportData.period
+    };
+    Object.entries(tabTitles).forEach(([id, title]) => {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('data-print-title', title);
+    });
 
-    // A4 landscape in mm
-    const PAGE_W_MM = 297;
-    const PAGE_H_MM = 210;
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    let firstPage = true;
+    // Make sure all charts are rendered before printing
+    initAdsCharts();
+    initAnalyticsCharts();
 
-    for (const tab of tabs) {
-        // Switch to tab and initialise any charts
-        switchTab(tab);
-        if (tab === 'google-ads') initAdsCharts();
-        if (tab === 'analytics') initAnalyticsCharts();
-
-        // Let charts & layout settle
-        await new Promise(r => setTimeout(r, 500));
-
-        // Capture the tab-pane itself (full scroll height, not just visible viewport)
-        const el = document.getElementById('tab-' + tab);
-        if (!el) continue;
-
-        const canvas = await html2canvas(el, {
-            scale: 2,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: el.scrollWidth,
-            width: el.scrollWidth,
-            height: el.scrollHeight
-        });
-
-        const imgData = canvas.toDataURL('image/jpeg', 0.92);
-
-        // Work out how to fit the captured image onto the A4 landscape page
-        const imgW = canvas.width;
-        const imgH = canvas.height;
-        const ratio = Math.min(PAGE_W_MM / imgW, PAGE_H_MM / imgH);
-        const fitW = imgW * ratio;
-        const fitH = imgH * ratio;
-        const offsetX = (PAGE_W_MM - fitW) / 2;
-        const offsetY = (PAGE_H_MM - fitH) / 2;
-
-        if (!firstPage) pdf.addPage('a4', 'landscape');
-        firstPage = false;
-
-        // White page background, then image
-        pdf.setFillColor(255, 255, 255);
-        pdf.rect(0, 0, PAGE_W_MM, PAGE_H_MM, 'F');
-        pdf.addImage(imgData, 'JPEG', offsetX, offsetY, fitW, fitH);
-    }
-
-    // Restore original tab
-    switchTab(originalTab);
-    if (originalTab === 'google-ads') initAdsCharts();
-    if (originalTab === 'analytics') initAnalyticsCharts();
-
-    pdf.save('WDF_FullReport_' + reportData.period.replace(/\s/g, '_') + '.pdf');
-
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-file-pdf"></i> Export PDF'; }
+    // Short delay then print
+    setTimeout(() => window.print(), 200);
 }
 
 // ════════════════════════════════════════════════
